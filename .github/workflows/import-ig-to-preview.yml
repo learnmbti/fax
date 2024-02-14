@@ -11,4 +11,4 @@ jobs:
   import-ig-to-preview:
     runs-on: ubuntu-latest
     steps:
-      - run: "curl -X POST -v --location '${{secrets.CMS_URL}}/ig/import' --header 'Content-Type: application/json' --header 'Authorization: ${{secrets.CMS_AUTH}}' -d '{}'"
+      - run: "curl --fail-with-body -X POST -v --location '${{secrets.CMS_URL}}/ig/import' --header 'Content-Type: application/json' --header 'Authorization: ${{secrets.CMS_AUTH}}' -d '{}'"
