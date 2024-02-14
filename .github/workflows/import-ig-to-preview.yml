@@ -1,0 +1,12 @@
+name: import-ig-to-preview
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 10-59/15 * * * *
+
+jobs:
+  import-ig-to-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ${{ secrets.IMPORT_IG_COMMAND }}
