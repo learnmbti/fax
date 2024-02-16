@@ -5,7 +5,7 @@ import { finished } from 'stream/promises';
 
 const authHeader = process.env.CMS_AUTH
 const cmsUrl = process.env.CMS_URL
-const pageSize = 10
+const pageSize = 1000
 
 export type IIgPost = {
   id: string
