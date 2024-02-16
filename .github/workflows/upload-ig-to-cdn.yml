@@ -17,4 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: oven-sh/setup-bun@v1
+      - uses: actions/checkout@v4
+        with:
+          repository: learnmbti/cdn.learnmbti.com
+          path: cdn
       - run: bun uploadIgToCdn.ts
+      - uses: cpina/github-action-push-to-another-repository@main
+        env:
+          # SSH_DEPLOY_KEY: ${{ secrets.TOAST_SSH_KEY }}
+          API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN }}
+        with:
+          source-directory: 'cdn'
+          destination-github-username: learnmbti
+          destination-repository-name: cdn.learnmbti.com
+          target-branch: main
