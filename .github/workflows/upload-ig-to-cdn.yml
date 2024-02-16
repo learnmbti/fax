@@ -1,0 +1,20 @@
+name: upload-ig-to-cdn
+
+on:
+  push:
+    branches: ['master']
+  workflow_dispatch:
+  schedule:
+    - cron: 10-59/15 * * * *
+
+env:
+  CMS_URL: ${{secrets.CMS_URL}}
+  CMS_AUTH: ${{secrets.CMS_AUTH}}
+
+jobs:
+  import-ig-to-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+      - run: bun uploadIgToCdn.ts
