@@ -12,7 +12,7 @@ env:
   CMS_AUTH: ${{secrets.CMS_AUTH}}
 
 jobs:
-  import-ig-to-preview:
+  upload-ig-to-cdn:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
