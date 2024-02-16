@@ -15,12 +15,13 @@ jobs:
   import-ig-to-preview:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - uses: actions/checkout@v4
         with:
           repository: learnmbti/cdn.learnmbti.com
           path: cdn
+          token: ${{ secrets.GH_TOKEN }}
       - run: bun uploadIgToCdn.ts
       - uses: cpina/github-action-push-to-another-repository@main
         env:
