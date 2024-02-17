@@ -57,6 +57,6 @@ const consumer = async () => {
 await Promise.all([consumer(),consumer(), consumer(), consumer()])
 
 console.log('writing json file')
-writeFileSync('cdn/posts.json', JSON.stringify(postsTransformed))
+writeFileSync('cdn/posts.json', JSON.stringify(postsTransformed, null, 2))
 
 console.log('done')
