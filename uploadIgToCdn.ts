@@ -27,11 +27,6 @@ if (!existsSync('cdn/img/ig')) {
   mkdirSync('cdn/img/ig', {recursive: true})
 }
 
-const postsTransformed = posts.map((post) => ({
-  ...post,
-  media_url: `https://cdn.learnmbti.com/img/ig/${post.id}.jpg`
-}))
-
 const downloadFile = async (url: string, fileName: string) => {
   if (existsSync(fileName)) {
     console.log(`${fileName} exists, skipping download`)
@@ -55,8 +50,5 @@ const consumer = async () => {
 }
 
 await Promise.all([consumer(),consumer(), consumer(), consumer()])
-
-console.log('writing json file')
-writeFileSync('cdn/posts.json', JSON.stringify(postsTransformed, null, 2))
 
 console.log('done')

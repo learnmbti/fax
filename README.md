@@ -24,4 +24,4 @@ This is running on schedule to fetch latest ig posts and upload to cms, and then
 
 ### 2. Upload ig to cdn
 
-After changing tags of ig posts, this will download latest updates from cms, download image of posts, and upload to cdn
+This get the ig posts from review, download the ig image and upload to cdn. trigger by cms when imported new ig posts
