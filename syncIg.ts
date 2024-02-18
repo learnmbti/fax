@@ -71,8 +71,17 @@ const { postUpsertResults, posts, creators, downloadImages } = result
 console.log('postUpsertResults', postUpsertResults)
 console.log(`fetched ${posts.length} posts, ${creators.length} creators, total of ${downloadImages.length} images`)
 
-writeFileSync('cdn/posts.json', JSON.stringify(posts, null, 2))
-writeFileSync('cdn/creators.json', JSON.stringify(creators, null, 2))
+const excludeFields = (array: Record<string, unknown>[]) => {
+  return array.map(({
+    _id,
+    __v,
+    profile_picture_url,
+    media_url,
+    ...rest }) => rest)
+}
+
+writeFileSync('cdn/posts.json', JSON.stringify(excludeFields(posts), null, 2))
+writeFileSync('cdn/creators.json', JSON.stringify(excludeFields(creators), null, 2))
 
 console.log('wrote to json files')
 
