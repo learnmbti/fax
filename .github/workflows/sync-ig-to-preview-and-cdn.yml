@@ -1,16 +1,18 @@
-name: upload-ig-to-cdn
+name: sync-ig-to-preview-and-cdn
 
 on:
   push:
     branches: ['master']
   workflow_dispatch:
+  schedule:
+    - cron: 10-59/15 * * * *
 
 env:
   CMS_URL: ${{secrets.CMS_URL}}
   CMS_AUTH: ${{secrets.CMS_AUTH}}
 
 jobs:
-  upload-ig-to-cdn:
+  sync-ig-to-preview-and-cdn:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +22,7 @@ jobs:
           repository: learnmbti/cdn.learnmbti.com
           path: cdn
           token: ${{ secrets.GH_TOKEN }}
-      - run: bun uploadIgToCdn.ts
+      - run: bun syncIg.ts
       - uses: cpina/github-action-push-to-another-repository@main
         env:
           # SSH_DEPLOY_KEY: ${{ secrets.TOAST_SSH_KEY }}

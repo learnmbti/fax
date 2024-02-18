@@ -1,0 +1,95 @@
+import { existsSync, mkdirSync, createWriteStream, writeFileSync } from "fs"
+
+import { Readable } from 'stream';
+import { finished } from 'stream/promises';
+
+const authHeader = process.env.CMS_AUTH ?? ''
+const cmsUrl = process.env.CMS_URL ?? 'http://localhost:3000/cms'
+
+type IIgPost = {
+  id: string
+  caption: string
+  media_url: string
+  permalink: string
+  username: string
+  timestamp: string
+  tags: string[]
+  updatedAt: string
+}
+
+type IIgCreator = {
+  id: string
+  username: string
+  profile_picture_url: string
+}
+
+type ImportResponse = {
+  postUpsertResults: unknown
+  posts: IIgPost[]
+  creators: IIgCreator[]
+}
+
+if (!existsSync('cdn/img/ig')) {
+  mkdirSync('cdn/img/ig', { recursive: true })
+}
+
+const isValidImportResponse = (payload: unknown | ImportResponse): payload is ImportResponse => {
+  return typeof payload === 'object' && payload !== null && 'posts' in payload && Array.isArray(payload.posts) && 'creators' in payload && Array.isArray(payload.creators)
+}
+
+console.log('importing and fetching posts and creators...')
+
+const response = await fetch(`${cmsUrl}/ig/import`, {
+  method: 'POST',
+  headers: {
+    Authorization: authHeader,
+  }
+})
+if (response.status !== 200) {
+  throw new Error(`error when importing ig status=${response.status} body=${await response.text()}`)
+}
+const result = await response.json()
+if (!isValidImportResponse(result)) {
+  console.error(result)
+  throw new Error(`got invalid import response`)
+}
+const { postUpsertResults, posts, creators } = result
+
+console.log('postUpsertResults', postUpsertResults)
+console.log(`fetched ${posts.length} posts, ${creators.length} creators`)
+
+writeFileSync('cdn/posts.json', JSON.stringify(posts, null, 2))
+writeFileSync('cdn/creators.json', JSON.stringify(creators, null, 2))
+
+console.log('wrote to json files')
+
+const downloadFile = async (url: string, fileName: string) => {
+  if (existsSync(fileName)) {
+    console.log(`${fileName} exists, skipping download`)
+    return
+  }
+  console.log(`downloading ${fileName}`)
+  const res = await fetch(url);
+  const fileStream = createWriteStream(fileName, { flags: 'wx' });
+  if (res.body) {
+    await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
+  }
+};
+
+const queue: Array<() => Promise<void>> = [
+  posts.map(post => (() => downloadFile(post.media_url, `cdn/img/ig/${post.id}.jpg`))),
+  creators.map(creator => (() => downloadFile(creator.profile_picture_url, `cdn/img/ig/${creator.username}.jpg`)))
+].flat()
+
+const consumer = async () => {
+  while (queue.length > 0) {
+    console.log(`${queue.length} iamges left...`)
+    await queue.pop()?.()
+  }
+}
+
+console.log('downloading image files')
+
+await Promise.all([consumer(), consumer(), consumer(), consumer()])
+
+console.log('done')
