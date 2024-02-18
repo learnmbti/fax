@@ -1,7 +1,9 @@
-import { writeFileSync, existsSync, mkdirSync, createWriteStream } from "fs"
+import { existsSync, mkdirSync, createWriteStream } from "fs"
 
-import { Readable } from'stream';
+import { Readable } from 'stream';
 import { finished } from 'stream/promises';
+
+import creators from './cdn/creators.json'
 
 const authHeader = process.env.CMS_AUTH
 const cmsUrl = process.env.CMS_URL
@@ -40,7 +42,10 @@ const downloadFile = async (url: string, fileName: string) => {
   }
 };
 
-const queue: Array<() => Promise<void>> = posts.map(post => (() => downloadFile(post.media_url, `cdn/img/ig/${post.id}.jpg`)))
+const queue: Array<() => Promise<void>> = [
+  posts.map(post => (() => downloadFile(post.media_url, `cdn/img/ig/${post.id}.jpg`))),
+  creators.map(creator => (() => downloadFile(creator.profile_picture_url, `cdn/img/ig/${creator.username}.jpg`)))
+].flat()
 
 const consumer = async () => {
   while (queue.length > 0) {
