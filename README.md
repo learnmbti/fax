@@ -18,10 +18,14 @@ bun ./index.ts # or others scripts
 
 ## Use cases
 
-### 1. Import ig to preview
+### 1. Sync ig to preview and cdn
 
-This is running on schedule to fetch latest ig posts and upload to cms, and then we can manage tags of the new posts inside cms
+A github action that runs every 15 minutes to ask cms to import ig posts, and refresh cms for json and jpg
 
-### 2. Upload ig to cdn
-
-This get the ig posts from review, download the ig image and upload to cdn. trigger by cms when imported new ig posts
+1. request cms/ig/import
+   1. for each ig creators, fetch their info and posts, put to mongo
+   2. response posts and creators info that should be visible to readers
+   3. response the list of images should be downloaded
+2. store the response in 1.2 to posts.json and creators.json
+3. download all images
+4. push the new json and images to cdn

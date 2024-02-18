@@ -23,10 +23,16 @@ type IIgCreator = {
   profile_picture_url: string
 }
 
+type DownloadImage = {
+  src: string
+  fileName: string
+}
+
 type ImportResponse = {
   postUpsertResults: unknown
   posts: IIgPost[]
   creators: IIgCreator[]
+  downloadImages: DownloadImage[]
 }
 
 if (!existsSync('cdn/img/ig')) {
@@ -34,7 +40,14 @@ if (!existsSync('cdn/img/ig')) {
 }
 
 const isValidImportResponse = (payload: unknown | ImportResponse): payload is ImportResponse => {
-  return typeof payload === 'object' && payload !== null && 'posts' in payload && Array.isArray(payload.posts) && 'creators' in payload && Array.isArray(payload.creators)
+  return typeof payload === 'object'
+   && payload !== null
+   && 'posts' in payload
+   && Array.isArray(payload.posts)
+   && 'creators' in payload
+   && Array.isArray(payload.creators)
+   && 'downloadImages' in payload
+   && Array.isArray(payload.downloadImages)
 }
 
 console.log('importing and fetching posts and creators...')
@@ -53,10 +66,10 @@ if (!isValidImportResponse(result)) {
   console.error(result)
   throw new Error(`got invalid import response`)
 }
-const { postUpsertResults, posts, creators } = result
+const { postUpsertResults, posts, creators, downloadImages } = result
 
 console.log('postUpsertResults', postUpsertResults)
-console.log(`fetched ${posts.length} posts, ${creators.length} creators`)
+console.log(`fetched ${posts.length} posts, ${creators.length} creators, total of ${downloadImages.length} images`)
 
 writeFileSync('cdn/posts.json', JSON.stringify(posts, null, 2))
 writeFileSync('cdn/creators.json', JSON.stringify(creators, null, 2))
@@ -76,10 +89,7 @@ const downloadFile = async (url: string, fileName: string) => {
   }
 };
 
-const queue: Array<() => Promise<void>> = [
-  posts.map(post => (() => downloadFile(post.media_url, `cdn/img/ig/${post.id}.jpg`))),
-  creators.map(creator => (() => downloadFile(creator.profile_picture_url, `cdn/img/ig/${creator.username}.jpg`)))
-].flat()
+const queue: Array<() => Promise<void>> = downloadImages.map(downloadImage => (() => downloadFile(downloadImage.src, `cdn/${downloadImage.fileName}`)))
 
 const consumer = async () => {
   while (queue.length > 0) {
