@@ -93,9 +93,11 @@ const downloadFile = async (url: string, fileName: string) => {
   console.log(`downloading ${fileName} from ${url}`)
   const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
   const fileStream = createWriteStream(fileName, { flags: 'wx' });
+  console.log(res)
   if (res.body) {
     await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
   }
+  console.log(`downloaded ${fileName} from ${url}`)
 };
 
 const queue: Array<() => Promise<void>> = downloadImages.map(downloadImage => (() => downloadFile(downloadImage.src, `cdn/${downloadImage.fileName}`)))
@@ -103,7 +105,7 @@ const queue: Array<() => Promise<void>> = downloadImages.map(downloadImage => ((
 const consumer = async () => {
   while (queue.length > 0) {
     console.log(`${queue.length} iamges left...`)
-    await queue.pop()?.()
+    await queue.pop()?.().catch(e => console.error(e))
   }
 }
 
