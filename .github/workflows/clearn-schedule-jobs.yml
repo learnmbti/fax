@@ -1,0 +1,14 @@
+name: clean-schedule-job
+
+on:
+  workflow_dispatch:
+
+env:
+  API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  clean-schedule-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh clean-schedule-jobs.sh
