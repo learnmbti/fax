@@ -87,7 +87,8 @@ writeFileSync('cdn/creators.json', JSON.stringify(excludeFields(creators), null,
 console.log('wrote to json files')
 
 const downloadFile = async (url: string, fileName: string) => {
-  if (existsSync(fileName)) {
+  const forceDownloadThisFile = process.env.FORCE_DOWNLOAD?.includes(fileName)
+  if (existsSync(fileName) && !forceDownloadThisFile) {
     console.log(`${fileName} exists, skipping download`)
     return
   }

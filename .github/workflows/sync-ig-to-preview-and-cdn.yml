@@ -4,12 +4,16 @@ on:
   push:
     branches: ['master']
   workflow_dispatch:
+    inputs:
+      force_download:
+        description: force download these filename, eg img/ig/18050422750628550.jpg
   schedule:
     - cron: 10-59/15 * * * *
 
 env:
   CMS_URL: ${{secrets.CMS_URL}}
   CMS_AUTH: ${{secrets.CMS_AUTH}}
+  FORCE_DOWNLOAD: ${{inputs.force_download}}
 
 jobs:
   sync-ig-to-preview-and-cdn:
