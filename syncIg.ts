@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, createWriteStream, writeFileSync } from "fs"
 
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
+import { execSync } from 'child_process'
 
 const authHeader = process.env.CMS_AUTH ?? ''
 const cmsUrl = process.env.CMS_URL ?? 'http://localhost:3000/cms'
@@ -90,13 +91,13 @@ const downloadFile = async (url: string, fileName: string) => {
     console.log(`${fileName} exists, skipping download`)
     return
   }
-  console.log(`downloading ${fileName} from ${url}`)
-  const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
-  const fileStream = createWriteStream(fileName, { flags: 'wx' });
-  console.log(await res.json())
-  if (res.body) {
-    await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
-  }
+  console.log(`downloading ${__dirname}/${fileName} from ${url}`)
+  // const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
+  // const fileStream = createWriteStream(fileName, { flags: 'wx' });
+  // if (res.body) {
+  //   await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
+  // }
+  execSync(`curl "${url}" -o ${__dirname}/${fileName}`)
   console.log(`downloaded ${fileName} from ${url}`)
 };
 
