@@ -93,7 +93,7 @@ const downloadFile = async (url: string, fileName: string) => {
   console.log(`downloading ${fileName} from ${url}`)
   const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
   const fileStream = createWriteStream(fileName, { flags: 'wx' });
-  console.log(res)
+  console.log(await res.json())
   if (res.body) {
     await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
   }
