@@ -88,6 +88,7 @@ console.log('wrote to json files')
 
 const downloadFile = async (url: string, fileName: string) => {
   const forceDownloadThisFile = process.env.FORCE_DOWNLOAD?.includes(fileName)
+  console.log('force download', process.env.FORCE_DOWNLOAD, fileName, forceDownloadThisFile)
   if (existsSync(fileName) && !forceDownloadThisFile) {
     console.log(`${fileName} exists, skipping download`)
     return
