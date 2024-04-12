@@ -90,7 +90,7 @@ const downloadFile = async (url: string, fileName: string) => {
     console.log(`${fileName} exists, skipping download`)
     return
   }
-  console.log(`downloading ${fileName}`)
+  console.log(`downloading ${fileName} from ${url}`)
   const res = await fetch(url);
   const fileStream = createWriteStream(fileName, { flags: 'wx' });
   if (res.body) {
